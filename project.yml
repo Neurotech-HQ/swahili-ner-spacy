@@ -108,7 +108,7 @@ commands:
   - name: visualize-model
     help: Visualize the model's output interactively using Streamlit
     script:
-      - 'streamlit run scripts/visualize_model.py training/model-best "Karimu ni mtu mzuri sana."'
+      - 'streamlit run scripts/visualize_model.py training/model-best "Nimetembelea sehemu kumi za vivutio."'
     deps:
       - "scripts/visualize_model.py"
       - "training/model-best"
