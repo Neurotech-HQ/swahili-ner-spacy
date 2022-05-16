@@ -44,7 +44,7 @@ train-with-vectors:
       true
   deps:
     - path: configs/config.cfg
-      md5: e84d314e58c75f69272d6326c991ad0b
+      md5: 4bb6cf5ac1c79b2794e57aabae2e3788
     - path: corpus/train.spacy
       md5: dbb014b89edd51d8361cdeadf679e1a1
     - path: corpus/dev.spacy
@@ -72,17 +72,30 @@ train:
   cmd: python -m spacy run train
   script:
     - python -m spacy train configs/config.cfg --output training/ --paths.train corpus/train.spacy
-      --paths.dev corpus/dev.spacy --training.eval_frequency 5 --training.patience
-      2000 --gpu-id -1
+      --paths.dev corpus/dev.spacy --training.eval_frequency 10 --training.patience
+      3000 --gpu-id -1
   deps:
     - path: configs/config.cfg
-      md5: 4bb6cf5ac1c79b2794e57aabae2e3788
+      md5: 505a02e69d9f0d60de448b4e38f6df20
     - path: corpus/train.spacy
       md5: dbb014b89edd51d8361cdeadf679e1a1
     - path: corpus/dev.spacy
       md5: 872ab2bc5beaf54208bc445868dd7c8d
   outs:
     - path: training/model-best
+      md5: 62e0ea3921d747929861b3b369998a23
+  spacy_version: 3.2.2
+  spacy_git_version: bbaf41fb3
+package:
+  cmd: python -m spacy run package
+  script:
+    - python -m spacy package training/model-best packages --name ner --version 0.0.0
+      --force
+  deps:
+    - path: training/model-best
       md5: 66bf3c257058afd4b69c7cf184bf9a3c
+  outs:
+    - path: packages/sw_ner-0.0.0/dist/sw_ner-0.0.0.tar.gz
+      md5: null
   spacy_version: 3.2.2
   spacy_git_version: bbaf41fb3
