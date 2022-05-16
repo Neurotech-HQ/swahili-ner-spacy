@@ -1,0 +1,88 @@
+download:
+  cmd: python -m spacy run download
+  script:
+    - python -m spacy download xx_ent_wiki_sm
+  deps: []
+  outs: []
+  spacy_version: 3.2.2
+  spacy_git_version: bbaf41fb3
+convert:
+  cmd: python -m spacy run convert
+  script:
+    - python scripts/convert.py xx assets/train.json corpus/train.spacy
+    - python scripts/convert.py xx assets/dev.json corpus/dev.spacy
+  deps:
+    - path: assets/train.json
+      md5: 4e229e7ecc174a761d96671229284be3
+    - path: assets/dev.json
+      md5: d899171f870bbe067f5ece43d9eec35c
+    - path: scripts/convert.py
+      md5: 26a5ca230fbbafa8c01c5c85c46bea74
+  outs:
+    - path: corpus/train.spacy
+      md5: dbb014b89edd51d8361cdeadf679e1a1
+    - path: corpus/dev.spacy
+      md5: 872ab2bc5beaf54208bc445868dd7c8d
+  spacy_version: 3.2.2
+  spacy_git_version: bbaf41fb3
+create-config:
+  cmd: python -m spacy run create-config
+  script:
+    - python -m spacy init config --lang xx --pipeline ner configs/config.cfg --force
+  deps: []
+  outs:
+    - path: configs/config.cfg
+      md5: 4bb6cf5ac1c79b2794e57aabae2e3788
+  spacy_version: 3.2.2
+  spacy_git_version: bbaf41fb3
+train-with-vectors:
+  cmd: python -m spacy run train-with-vectors
+  script:
+    - python -m spacy train configs/config.cfg --output training/ --paths.train corpus/train.spacy
+      --paths.dev corpus/dev.spacy --training.eval_frequency 10 --training.patience
+      50 --gpu-id -1 --initialize.vectors xx_ent_wiki_sm --components.tok2vec.model.embed.include_static_vectors
+      true
+  deps:
+    - path: configs/config.cfg
+      md5: e84d314e58c75f69272d6326c991ad0b
+    - path: corpus/train.spacy
+      md5: dbb014b89edd51d8361cdeadf679e1a1
+    - path: corpus/dev.spacy
+      md5: 872ab2bc5beaf54208bc445868dd7c8d
+  outs:
+    - path: training/model-best
+      md5: 03cdcbfe40d4e884cf7c8b67040569db
+  spacy_version: 3.2.2
+  spacy_git_version: bbaf41fb3
+evaluate:
+  cmd: python -m spacy run evaluate
+  script:
+    - python -m spacy evaluate training/model-best corpus/dev.spacy --output training/metrics.json
+  deps:
+    - path: corpus/dev.spacy
+      md5: 872ab2bc5beaf54208bc445868dd7c8d
+    - path: training/model-best
+      md5: 03cdcbfe40d4e884cf7c8b67040569db
+  outs:
+    - path: training/metrics.json
+      md5: 419d700902636594d207cec367a6b366
+  spacy_version: 3.2.2
+  spacy_git_version: bbaf41fb3
+train:
+  cmd: python -m spacy run train
+  script:
+    - python -m spacy train configs/config.cfg --output training/ --paths.train corpus/train.spacy
+      --paths.dev corpus/dev.spacy --training.eval_frequency 5 --training.patience
+      2000 --gpu-id -1
+  deps:
+    - path: configs/config.cfg
+      md5: 4bb6cf5ac1c79b2794e57aabae2e3788
+    - path: corpus/train.spacy
+      md5: dbb014b89edd51d8361cdeadf679e1a1
+    - path: corpus/dev.spacy
+      md5: 872ab2bc5beaf54208bc445868dd7c8d
+  outs:
+    - path: training/model-best
+      md5: 66bf3c257058afd4b69c7cf184bf9a3c
+  spacy_version: 3.2.2
+  spacy_git_version: bbaf41fb3
